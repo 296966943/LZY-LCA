@@ -1,0 +1,88 @@
+#include<iostream>
+#include<cstring>
+#include<cmath>
+#include<algorithm>
+#include<queue>
+#include<cstdio>
+#include<cstdlib>
+#include<string>
+#include<ctime>
+using namespace std;
+struct ss
+{
+	int y,next;
+}e[1000010];
+int lin[1000010],kl,n,m,kkk[1000010];
+inline void insert(int xx,int yy)
+{
+	e[++kl].next=lin[xx];
+	lin[xx]=kl;
+	e[kl].y=yy;
+}
+int dep[1000010],fa[1000010];
+int ff[1000010][40];
+inline void dfs1(int now,int dd)
+{
+	//cout<<fa[now]<<' '<<now<<endl;
+	dep[now]=dd;
+	//cout<<now<<':'<<endl;
+	for(int j=1;(1<<j)<=dep[now];j++)
+	{
+		ff[now][j]=ff[ff[now][j-1]][j-1];
+		//cout<<"     "<<j<<':'<<ff[now][j]<<endl;
+	}
+	for(int i=lin[now];i!=0;i=e[i].next)
+	{
+		if(kkk[e[i].y]==0)
+		{
+			kkk[e[i].y]=1;
+			ff[e[i].y][0]=fa[e[i].y]=now;
+			dfs1(e[i].y,dd+1);
+		}
+	}
+}
+int LCA(int u,int v)  
+{  
+    if(dep[u]<dep[v])swap(u,v);
+    int delta=dep[u]-dep[v];
+    for(int x=30;x>=0;x--)  
+        if((1<<x)&delta)
+            u=ff[u][x];  
+    if(u==v)
+		return u;  
+    for(int x=30;x>=0;x--)
+        if(ff[u][x]!=ff[v][x])
+        {  
+            u=ff[u][x];  
+            v=ff[v][x];
+        }  
+    return ff[u][0];
+} 
+int root;
+int main()
+{
+	//freopen("subset.in","r",stdin);
+	//freopen("subset.out","w",stdout);
+	//    freopen("a.in","r",stdin);
+	//freopen("add2.out","w",stdout);
+	scanf("%d%d%d",&n,&m,&root);
+	for(int i=1;i<n;i++)
+	{
+		int xx,yy;
+		scanf("%d%d",&xx,&yy);
+		insert(xx,yy);
+		insert(yy,xx);
+	}
+	kkk[root]=1;
+	ff[root][0]=fa[root]=root;
+	
+	dfs1(root,1);
+	for(int i=1;i<=m;i++)
+	{
+		int xx,yy,vv;
+		scanf("%d%d",&xx,&yy);
+		vv=LCA(xx,yy);
+		printf("%d\n",vv);
+	}
+	return 0;
+}
